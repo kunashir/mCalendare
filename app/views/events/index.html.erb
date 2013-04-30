@@ -1,0 +1,56 @@
+<%= link_to "Add event", new_event_path %>
+<%= form_tag(events_path, :method => "get") do %>
+  <%= label_tag(:q, "Period type:") %>
+  <%= select_tag :type_period, options_for_select([["month", 0], ["week", 1], ["day", 2]]) %>
+  <br><%= submit_tag("Change") %>
+<% end %>
+<div id="calendar">
+  <h2 id="month">
+    <% if @type_period == 0 %>
+      <%= link_to "<", :month => (@date.beginning_of_month-1).strftime("%Y-%m-%d") %>
+    <% elsif @type_period == 1 %>
+      <%= link_to "<", {:week => (@date.beginning_of_week-1).strftime("%Y-%m-%d"), :type_period => 1}  %>
+    <% elsif @type_period == 2 %>
+      <%= link_to "<", {:day => (@date.beginning_of_day-1).strftime("%Y-%m-%d"), :type_period => 2} %>
+    <% end %>
+    <%=h @date.strftime("%B %Y") if @type_period == 0%>
+    <%=h @date.strftime("%W %Y") if @type_period == 1%>
+    <%=h @date.strftime("%D") if @type_period == 2%>
+    <% if @type_period == 0 %>
+      <%= link_to ">", :month => (@date.end_of_month+1).strftime("%Y-%m-%d") %>
+    <% elsif @type_period == 1 %>
+      <%= link_to ">", {:week => (@date.end_of_week+1).strftime("%Y-%m-%d"), :type_period => 1} %>
+    <% elsif @type_period == 2 %>
+      <%= link_to ">", {:day => (@date.end_of_day+1).strftime("%Y-%m-%d"),  :type_period => 2} %>
+    <% end %>
+  </h2>
+  <%= debug(@type_period)  %>
+  
+  <%= table_for(@events) do |t| %> 
+    <%= t.body do |front_man| %>
+      <%= t.r do %>
+        <%= t.d(h(front_man.day)) %>
+        <%= t.d(h(front_man.description)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% calendar_for @events, :year => @date.year, :month => @date.month do |calendar| %>
+    <%= debug(@date)  %>
+    <%= debug(@events)  %>
+    <%= calendar.head('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') %>
+    <% calendar.day(:day_method => :day) do |date, events| %>
+      <%= date.day %>
+      <ul>
+        <% if events.nil? %>
+          <%= date.cweek %>
+        <% else %>
+          <% for event in events %>
+            <li>event.description</li>
+          <% end %>
+        <% end %>
+      </ul>
+    <% end %>
+  <% end %>
+</div>
+
