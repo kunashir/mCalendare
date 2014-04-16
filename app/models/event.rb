@@ -33,36 +33,31 @@ class Event < ActiveRecord::Base
     end
     return days_of_event
   end
-  
+
   def in_day_of_week(weeks_day)
-    ans = false
-    case (weeks_day)
-      when 1 then ans = true if self.day1 != 0
-      when 2 then ans = true if self.day2 != 0
-      when 3 then ans = true if self.day3 != 0
-      when 4 then ans = true if self.day4 != 0
-      when 5 then ans = true if self.day5 != 0
-      when 6 then ans = true if self.day6 != 0
-      when 7 then ans = true if self.day7 != 0
-    end
-    return ans
-  end 
+    # ans = false
+    # case (weeks_day)
+    #   when 1 then ans = true if self.day1 != 0
+    #   when 2 then ans = true if self.day2 != 0
+    #   when 3 then ans = true if self.day3 != 0
+    #   when 4 then ans = true if self.day4 != 0
+    #   when 5 then ans = true if self.day5 != 0
+    #   when 6 then ans = true if self.day6 != 0
+    #   when 7 then ans = true if self.day7 != 0
+    # end
+    #return ((weeks_day > 0) and (weeks_day < 8)) if self["day#{weeks_day}"] != 0
+    return self["day#{weeks_day}"] != 0
+  end
 
   def self.events_days(beginninig_date, end_date)
     events = Event.get_active_events(beginninig_date)
     events_days = []
-    for event in events do       
+    for event in events do
       for cur_day in beginninig_date..end_date
         #puts "Year #{beginninig_date.year} - #{beginninig_date.month} - #{cur_day}"
         #cur_date = Date.new(beginninig_date.year, beginninig_date.month, cur_day)
-        if event.day_of_mounth == cur_day.day
+        if (event.day_of_mounth == cur_day.day) or event.in_day_of_week(cur_day.days_to_week_start + 1)
           #events_days.push(EventDay.new(:day => cur_day, :description => event.description, :event_id => event))
-           ev1 = EventDay.new #(:day => cur_day, :description => event.description, :event_id => event)
-          ev1.day = cur_day
-          ev1.description = event.description
-          ev1.event_id = event
-          events_days.push(ev1)
-        elsif event.in_day_of_week(cur_day.days_to_week_start + 1)
           ev1 = EventDay.new #(:day => cur_day, :description => event.description, :event_id => event)
           ev1.day = cur_day
           ev1.description = event.description
@@ -71,8 +66,8 @@ class Event < ActiveRecord::Base
         end
       end
     end
-    return events_days 
-  end 
+    return events_days
+  end
 
- 
+
 end
